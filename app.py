@@ -73,6 +73,7 @@ tab_chat, tab_monitoring, tab_about = st.tabs(["💬 Chat", "📊 Monitoring", "
 with tab_chat:
     st.title("🧪 Chemical SDS Assistant")
     st.caption("Hybrid RAG (Dense HNSW + BM25 → RRF → Cross-Encoder Rerank → Grounded LLM Answer)")
+    st.caption("👩‍💻 تم التطوير بواسطة: Eman Moustafa & Aya Shaaban")
 
     if not indexes_ready:
         st.warning("No index found yet. Click **'(Re)build indexes from /data'** in the sidebar first.")
@@ -170,6 +171,7 @@ with tab_monitoring:
 # ---------------------------------------------------------------------------
 with tab_about:
     st.title("ℹ️ About this pipeline")
+    st.markdown("**👩‍💻 Developed by:** Eman Moustafa & Aya Shaaban")
     st.markdown(
         """
 **Architecture**
