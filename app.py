@@ -72,7 +72,7 @@ tab_chat, tab_monitoring, tab_about = st.tabs(["💬 Chat", "📊 Monitoring", "
 with tab_chat:
     st.title("🧪 Chemical SDS Assistant")
     st.caption("Hybrid RAG (Dense HNSW + BM25 → RRF → Cross-Encoder Rerank → Grounded LLM Answer)")
-    st.caption("👩‍💻 تم التطوير بواسطة: Eman Moustafa & Aya Shaaban")
+    st.caption("👩‍💻 تم التطوير بواسطة: Iman Moustafa & Aya Shaaban")
 
     if not indexes_ready:
         st.warning("No index found yet. Click **'(Re)build indexes from /data'** in the sidebar first.")
