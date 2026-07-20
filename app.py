@@ -185,12 +185,25 @@ def render_sources(sources: list) -> None:
 # ---------------------------------------------------------------------------
 st.sidebar.title("🧪 SDS RAG — Settings")
 
-api_key_input = st.sidebar.text_input(
-    "GROQ_API_KEY", value=os.environ.get("GROQ_API_KEY", ""), type="password"
-)
-if api_key_input:
-    os.environ["GROQ_API_KEY"] = api_key_input
-    config.GROQ_API_KEY = api_key_input
+# Prefer a key already configured via Streamlit Cloud "Secrets" or the
+# environment. In that case we never show an input box in the deployed app —
+# it's only shown as a fallback for local development when no key is set.
+_configured_key = ""
+try:
+    _configured_key = st.secrets.get("GROQ_API_KEY", "")
+except Exception:
+    pass
+if not _configured_key:
+    _configured_key = os.environ.get("GROQ_API_KEY", "")
+
+if _configured_key:
+    os.environ["GROQ_API_KEY"] = _configured_key
+    config.GROQ_API_KEY = _configured_key
+else:
+    api_key_input = st.sidebar.text_input("GROQ_API_KEY", value="", type="password")
+    if api_key_input:
+        os.environ["GROQ_API_KEY"] = api_key_input
+        config.GROQ_API_KEY = api_key_input
 
 use_query_rewrite = st.sidebar.checkbox("Enable query rewriting", value=config.ENABLE_QUERY_REWRITE_DEFAULT)
 use_cache = st.sidebar.checkbox("Enable caching", value=True)
