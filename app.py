@@ -40,15 +40,10 @@ st.markdown(
     --surface: #F7F9FA;
     --line: #E3E8EB;
 }
-
 html, body, [class*="css"] { font-family: 'IBM Plex Sans', sans-serif; }
 code, pre, .mono { font-family: 'IBM Plex Mono', monospace !important; }
-
-/* Hide default Streamlit chrome for a cleaner look */
 #MainMenu { visibility: hidden; }
 footer { visibility: hidden; }
-
-/* ---- Hero banner ---- */
 .hero {
     background: linear-gradient(120deg, var(--teal) 0%, var(--teal-dark) 100%);
     border-radius: 14px;
@@ -74,8 +69,6 @@ footer { visibility: hidden; }
     font-size: 0.82rem;
     margin-top: 0.75rem;
 }
-
-/* Pipeline chip row */
 .chip-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
 .chip {
     background: rgba(255,255,255,0.12);
@@ -88,8 +81,6 @@ footer { visibility: hidden; }
     white-space: nowrap;
 }
 .chip .arrow { color: var(--amber); margin-inline-start: 0.4rem; }
-
-/* ---- Source / citation cards ---- */
 .source-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -125,8 +116,6 @@ footer { visibility: hidden; }
     color: #3B4656;
     line-height: 1.5;
 }
-
-/* ---- Timing strip ---- */
 .timing-strip {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.74rem;
@@ -138,8 +127,6 @@ footer { visibility: hidden; }
     display: inline-block;
     margin-top: 0.4rem;
 }
-
-/* ---- Sidebar ---- */
 section[data-testid="stSidebar"] {
     background: var(--surface);
     border-right: 1px solid var(--line);
@@ -148,12 +135,8 @@ section[data-testid="stSidebar"] h1 {
     color: var(--teal-dark);
     font-size: 1.15rem;
 }
-
-/* ---- Tabs ---- */
 .stTabs [data-baseweb="tab"] { font-weight: 600; }
 .stTabs [aria-selected="true"] { color: var(--teal) !important; }
-
-/* ---- Buttons ---- */
 .stButton > button {
     border-radius: 8px;
     border: 1px solid var(--teal);
@@ -165,8 +148,6 @@ section[data-testid="stSidebar"] h1 {
     color: #fff;
     border-color: var(--teal);
 }
-
-/* ---- Metric cards ---- */
 div[data-testid="stMetric"] {
     background: var(--surface);
     border: 1px solid var(--line);
