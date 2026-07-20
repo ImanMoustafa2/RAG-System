@@ -176,7 +176,7 @@ To add a new SDS document:
 
 ---
 
-## 👥 Contributors
+## 👥 Contributors.
 - [Aya Shaaban ](https://github.com/ayashaaban049-crypto)
 - [Iman Moustafa](https://github.com/ImanMoustafa2)
 
