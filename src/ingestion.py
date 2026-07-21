@@ -22,6 +22,11 @@ SECTION_RE = re.compile(r"SECTION\s+(\d+):\s*([A-Z ,()/&-]+)")
 CAS_RE = re.compile(r"CAS Number\s*[:\-]?\s*([0-9\-]+)")
 CHEMICAL_NAME_RE = re.compile(r"Chemical Name\s*[:\-]?\s*(.+)")
 
+# Per-chunk CAS pattern used by multi-chemical reference guides (e.g. the
+# NIOSH Pocket Guide), which repeats "CAS#: <number>" once per chemical
+# entry rather than once per document.
+INLINE_CAS_RE = re.compile(r"CAS#\s*[:\-]?\s*([0-9\-]+)")
+
 
 def _extract_chemical_name(text: str, fallback: str) -> str:
     m = CHEMICAL_NAME_RE.search(text)
@@ -33,6 +38,19 @@ def _extract_chemical_name(text: str, fallback: str) -> str:
 def _extract_cas(text: str) -> str:
     m = CAS_RE.search(text)
     return m.group(1).strip() if m else "unknown"
+
+
+def _is_single_chemical_sds(full_text: str) -> bool:
+    """True for a classic one-chemical-per-file SDS; False for a
+    multi-chemical reference guide (many chemicals in a single PDF).
+
+    Only inspects the opening of the document (where a real SDS declares
+    "Chemical Name" / "CAS Number" in its identification section) to avoid
+    false positives from the phrase appearing incidentally deep inside a
+    large multi-chemical reference document.
+    """
+    header = full_text[:3000]
+    return bool(CHEMICAL_NAME_RE.search(header) and CAS_RE.search(header))
 
 
 def _dominant_section(text: str) -> str:
@@ -55,8 +73,20 @@ def load_raw_documents(data_dir: Path = config.DATA_DIR) -> List[Document]:
         loader = PyPDFLoader(str(pdf_path))
         pages = loader.load()
         full_text = "\n".join(p.page_content for p in pages)
-        chemical_name = _extract_chemical_name(full_text, fallback=pdf_path.stem)
-        cas_number = _extract_cas(full_text)
+        single_chemical = _is_single_chemical_sds(full_text)
+
+        if single_chemical:
+            chemical_name = _extract_chemical_name(full_text, fallback=pdf_path.stem)
+            cas_number = _extract_cas(full_text)
+            doc_type = "sds"
+        else:
+            # Multi-chemical reference guide (e.g. NIOSH Pocket Guide): don't
+            # force one chemical name onto every chunk. Metadata filters in
+            # the UI target single-chemical SDS files; this document is
+            # instead retrieved via free-text search across all its chunks.
+            chemical_name = "Reference Guide (multiple chemicals)"
+            cas_number = "varies"
+            doc_type = "reference_guide"
 
         for page in pages:
             page.metadata.update(
@@ -64,6 +94,7 @@ def load_raw_documents(data_dir: Path = config.DATA_DIR) -> List[Document]:
                     "source_file": pdf_path.name,
                     "chemical_name": chemical_name,
                     "cas_number": cas_number,
+                    "doc_type": doc_type,
                 }
             )
             docs.append(page)
@@ -86,6 +117,10 @@ def chunk_documents(
     for i, chunk in enumerate(chunks):
         chunk.metadata["section"] = _dominant_section(chunk.page_content)
         chunk.metadata["chunk_id"] = f"{chunk.metadata.get('source_file', 'doc')}_{i}"
+        if chunk.metadata.get("doc_type") == "reference_guide":
+            local_cas = INLINE_CAS_RE.search(chunk.page_content)
+            if local_cas:
+                chunk.metadata["cas_number"] = local_cas.group(1).strip()
     return chunks
 
 
