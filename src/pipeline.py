@@ -78,7 +78,7 @@ class RAGPipeline:
             pass  # No API key: still allow retrieval-only preview.
 
         with monitoring.timer() as t_rewrite:
-            rewritten = rewrite_query(query, llm=llm) if use_query_rewrite else query
+            rewritten = rewrite_query(query, llm=llm, full_rewrite=use_query_rewrite)
         timings["query_rewrite_ms"] = t_rewrite["elapsed_ms"]
 
         with monitoring.timer() as t_retrieve:
@@ -91,7 +91,10 @@ class RAGPipeline:
 
         with monitoring.timer() as t_gen:
             if llm is not None:
-                answer_text = generate_answer(rewritten, reranked, llm=llm)
+                # Use the ORIGINAL question (not the English-translated
+                # retrieval query) so the answer's language always matches
+                # what the user actually typed.
+                answer_text = generate_answer(query, reranked, llm=llm)
             else:
                 answer_text = (
                     "⚠️ GROQ_API_KEY غير مضبوط، تم عرض أفضل المقاطع المسترجعة فقط بدون توليد إجابة نهائية.\n\n"
